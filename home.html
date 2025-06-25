@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MANSIRI Dashboard - Your Personal Hub{% endblock %}
+
+{% block page_header %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="text-gradient mb-2">Welcome to MANSIRI</h1>
+                <p class="text-muted mb-0">Your comprehensive personal dashboard</p>
+            </div>
+            <div class="text-end">
+                <div class="text-muted small">
+                    <i class="fas fa-calendar me-1"></i>
+                    <span id="current-date"></span>
+                </div>
+                <div class="text-muted small">
+                    <i class="fas fa-clock me-1"></i>
+                    <span id="current-time"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Quick Stats -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-gradient-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">{{ task_stats.pending_tasks|default:0 }}</h4>
+                        <p class="mb-0">Pending Tasks</p>
+                    </div>
+                    <div class="fs-1 opacity-75">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{% url 'tasks:task_list' %}?status=pending" class="text-white text-decoration-none">
+                    View all <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-gradient-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">{{ weather_data.temperature|default:"--" }}°</h4>
+                        <p class="mb-0">{{ weather_data.location|default:"Current Weather" }}</p>
+                    </div>
+                    <div class="fs-1 opacity-75">
+                        <i class="fas fa-cloud-sun"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{% url 'weather:home' %}" class="text-white text-decoration-none">
+                    View weather <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-gradient-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">{{ news_count|default:0 }}</h4>
+                        <p class="mb-0">Latest News</p>
+                    </div>
+                    <div class="fs-1 opacity-75">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{% url 'news:home' %}" class="text-white text-decoration-none">
+                    Read news <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-gradient-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">{{ blog_posts_count|default:0 }}</h4>
+                        <p class="mb-0">Blog Posts</p>
+                    </div>
+                    <div class="fs-1 opacity-75">
+                        <i class="fas fa-blog"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{% url 'blog:home' %}" class="text-white text-decoration-none">
+                    Read blog <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="row">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+        <!-- Today's Tasks -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-day me-2"></i>Today's Tasks
+                </h5>
+                <a href="{% url 'tasks:create_task' %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i>Add Task
+                </a>
+            </div>
+            <div class="card-body">
+                {% if today_tasks %}
+                    <div class="list-group list-group-flush">
+                        {% for task in today_tasks %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input task-checkbox" type="checkbox" 
+                                               data-task-id="{{ task.id }}" 
+                                               {% if task.status == 'completed' %}checked{% endif %}>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 {% if task.status == 'completed' %}text-decoration-line-through text-muted{% endif %}">
+                                            {{ task.title }}
+                                        </h6>
+                                        <small class="text-muted">
+                                            {% if task.due_date %}
+                                                <i class="fas fa-clock me-1"></i>
+                                                Due: {{ task.due_date|date:"g:i A" }}
+                                            {% endif %}
+                                            {% if task.category %}
+                                                <span class="badge bg-secondary ms-2">{{ task.category.name }}</span>
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div>
+                                    {% if task.priority %}
+                                        <span class="badge" style="background-color: {{ task.priority.color }}">
+                                            {{ task.priority.name }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-check fs-1 text-muted mb-3"></i>
+                        <p class="text-muted">No tasks scheduled for today</p>
+                        <a href="{% url 'tasks:create_task' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Create Your First Task
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recent News -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-newspaper me-2"></i>Latest News
+                </h5>
+                <a href="{% url 'news:home' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_news %}
+                    <div class="row">
+                        {% for article in recent_news %}
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex">
+                                    {% if article.image_url %}
+                                        <img src="{{ article.image_url }}" alt="{{ article.title }}" 
+                                             class="rounded me-3" style="width: 80px; height: 60px; object-fit: cover;">
+                                    {% endif %}
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">
+                                            <a href="{{ article.url }}" target="_blank" class="text-decoration-none">
+                                                {{ article.title|truncatechars:60 }}
+                                            </a>
+                                        </h6>
+                                        <small class="text-muted">
+                                            {{ article.source.name }} • {{ article.published_at|timesince }} ago
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-newspaper fs-1 text-muted mb-3"></i>
+                        <p class="text-muted">No recent news available</p>
+                        <a href="{% url 'news:home' %}" class="btn btn-primary">Browse News</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recent Blog Posts -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-blog me-2"></i>Recent Blog Posts
+                </h5>
+                <a href="{% url 'blog:home' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_blog_posts %}
+                    {% for post in recent_blog_posts %}
+                        <div class="d-flex mb-3 {% if not forloop.last %}border-bottom pb-3{% endif %}">
+                            {% if post.featured_image %}
+                                <img src="{{ post.featured_image }}" alt="{{ post.title }}" 
+                                     class="rounded me-3" style="width: 80px; height: 60px; object-fit: cover;">
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">
+                                    <a href="{% url 'blog:post_detail' post.slug %}" class="text-decoration-none">
+                                        {{ post.title }}
+                                    </a>
+                                </h6>
+                                <p class="text-muted small mb-1">{{ post.excerpt|truncatechars:100 }}</p>
+                                <small class="text-muted">
+                                    By {{ post.author.username }} • {{ post.published_at|timesince }} ago
+                                    {% if post.category %}
+                                        • <span class="badge bg-secondary">{{ post.category.name }}</span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-blog fs-1 text-muted mb-3"></i>
+                        <p class="text-muted">No blog posts available</p>
+                        <a href="{% url 'blog:create_post' %}" class="btn btn-primary">Write Your First Post</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column -->
+    <div class="col-lg-4">
+        <!-- Weather Widget -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-cloud-sun me-2"></i>Current Weather
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                {% if weather_data %}
+                    <div class="mb-3">
+                        <h2 class="text-primary mb-0">{{ weather_data.temperature }}°C</h2>
+                        <p class="text-muted mb-0">{{ weather_data.description|title }}</p>
+                        <small class="text-muted">{{ weather_data.location }}</small>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Feels like</small>
+                            <strong>{{ weather_data.feels_like }}°C</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Humidity</small>
+                            <strong>{{ weather_data.humidity }}%</strong>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="py-3">
+                        <i class="fas fa-cloud fs-1 text-muted mb-3"></i>
+                        <p class="text-muted">Weather data not available</p>
+                        <a href="{% url 'weather:home' %}" class="btn btn-primary btn-sm">Setup Weather</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- World Clocks -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-globe me-2"></i>World Clocks
+                </h5>
+                <a href="{% url 'worldclock:home' %}" class="btn btn-sm btn-outline-primary">Manage</a>
+            </div>
+            <div class="card-body">
+                {% if world_clocks %}
+                    {% for clock in world_clocks %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ clock.timezone.city }}</strong>
+                                <small class="text-muted d-block">{{ clock.timezone.country }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="clock-time" data-timezone="{{ clock.timezone.timezone_name }}">
+                                    --:--
+                                </span>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}<hr class="my-2">{% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-clock fs-1 text-muted mb-3"></i>
+                        <p class="text-muted">No world clocks configured</p>
+                        <a href="{% url 'worldclock:home' %}" class="btn btn-primary btn-sm">Add Clocks</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'tasks:create_task' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus me-2"></i>Create Task
+                    </a>
+                    <a href="{% url 'blog:create_post' %}" class="btn btn-outline-success">
+                        <i class="fas fa-pen me-2"></i>Write Blog Post
+                    </a>
+                    <a href="{% url 'weather:search' %}" class="btn btn-outline-info">
+                        <i class="fas fa-search me-2"></i>Check Weather
+                    </a>
+                    <a href="{% url 'news:search' %}" class="btn btn-outline-warning">
+                        <i class="fas fa-newspaper me-2"></i>Browse News
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Update current date and time
+    function updateDateTime() {
+        const now = new Date();
+        $('#current-date').text(now.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }));
+        $('#current-time').text(now.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        }));
+    }
+    
+    // Update world clocks
+    function updateWorldClocks() {
+        $('.clock-time').each(function() {
+            const timezone = $(this).data('timezone');
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', {
+                timeZone: timezone,
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            $(this).text(time);
+        });
+    }
+    
+    // Initial update
+    updateDateTime();
+    updateWorldClocks();
+    
+    // Update every second
+    setInterval(updateDateTime, 1000);
+    setInterval(updateWorldClocks, 1000);
+    
+    // Handle task checkbox changes
+    $('.task-checkbox').change(function() {
+        const taskId = $(this).data('task-id');
+        const isCompleted = $(this).is(':checked');
+        const status = isCompleted ? 'completed' : 'pending';
+        
+        MANSIRI.utils.ajax(MANSIRI.api.updateTaskStatus, {
+            task_id: taskId,
+            status: status
+        }).done(function(response) {
+            if (response.status === 'success') {
+                const taskItem = $(this).closest('.list-group-item');
+                const taskTitle = taskItem.find('h6');
+                
+                if (isCompleted) {
+                    taskTitle.addClass('text-decoration-line-through text-muted');
+                    MANSIRI.utils.showToast('Task completed!', 'success');
+                } else {
+                    taskTitle.removeClass('text-decoration-line-through text-muted');
+                    MANSIRI.utils.showToast('Task marked as pending', 'info');
+                }
+            }
+        }.bind(this)).fail(function() {
+            // Revert checkbox state on error
+            $(this).prop('checked', !isCompleted);
+            MANSIRI.utils.showToast('Failed to update task status', 'danger');
+        }.bind(this));
+    });
+});
+</script>
+{% endblock %}
+

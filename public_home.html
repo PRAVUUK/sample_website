@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MANSIRI - Your Personal Dashboard{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="text-center py-5">
+            <h1 class="display-4 text-gradient mb-4">Welcome to MANSIRI</h1>
+            <p class="lead text-muted mb-4">
+                Your comprehensive personal dashboard for productivity, information, and organization.
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Get Started
+                </a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="text-center mb-5">Powerful Features for Your Daily Life</h2>
+    </div>
+    
+    {% for feature in features %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <i class="{{ feature.icon }} fs-1 text-primary"></i>
+                    </div>
+                    <h5 class="card-title">{{ feature.title }}</h5>
+                    <p class="card-text text-muted">{{ feature.description }}</p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Benefits Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card bg-gradient-primary text-white">
+            <div class="card-body py-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h3 class="mb-4">Why Choose MANSIRI?</h3>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-check-circle fs-4 me-3"></i>
+                                    <div>
+                                        <h6 class="mb-1">All-in-One Solution</h6>
+                                        <small class="opacity-75">Everything you need in one place</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-mobile-alt fs-4 me-3"></i>
+                                    <div>
+                                        <h6 class="mb-1">Responsive Design</h6>
+                                        <small class="opacity-75">Works on all devices</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-shield-alt fs-4 me-3"></i>
+                                    <div>
+                                        <h6 class="mb-1">Secure & Private</h6>
+                                        <small class="opacity-75">Your data is protected</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-rocket fs-4 me-3"></i>
+                                    <div>
+                                        <h6 class="mb-1">Fast & Reliable</h6>
+                                        <small class="opacity-75">Built for performance</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-center">
+                        <i class="fas fa-tachometer-alt" style="font-size: 8rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="text-center mb-5">How It Works</h2>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="text-center">
+            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                 style="width: 80px; height: 80px;">
+                <span class="fs-3 fw-bold">1</span>
+            </div>
+            <h5>Sign Up</h5>
+            <p class="text-muted">Create your free account in seconds and get started immediately.</p>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="text-center">
+            <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                 style="width: 80px; height: 80px;">
+                <span class="fs-3 fw-bold">2</span>
+            </div>
+            <h5>Customize</h5>
+            <p class="text-muted">Set up your dashboard with the features and information you need most.</p>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="text-center">
+            <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                 style="width: 80px; height: 80px;">
+                <span class="fs-3 fw-bold">3</span>
+            </div>
+            <h5>Stay Organized</h5>
+            <p class="text-muted">Manage your tasks, stay informed, and boost your productivity every day.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="row">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body text-center py-5">
+                <h3 class="mb-4">Ready to Get Started?</h3>
+                <p class="text-muted mb-4">
+                    Join thousands of users who have already transformed their daily routine with MANSIRI.
+                </p>
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-rocket me-2"></i>Start Your Journey Today
+                </a>
+                <div class="mt-3">
+                    <small class="text-muted">
+                        Already have an account? 
+                        <a href="{% url 'accounts:login' %}" class="text-decoration-none">Sign in here</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Add animation to feature cards
+    $('.card').hover(
+        function() {
+            $(this).addClass('shadow-lg').css('transform', 'translateY(-5px)');
+        },
+        function() {
+            $(this).removeClass('shadow-lg').css('transform', 'translateY(0)');
+        }
+    );
+    
+    // Smooth scrolling for anchor links
+    $('a[href^="#"]').on('click', function(event) {
+        var target = $(this.getAttribute('href'));
+        if (target.length) {
+            event.preventDefault();
+            $('html, body').stop().animate({
+                scrollTop: target.offset().top - 100
+            }, 1000);
+        }
+    });
+});
+</script>
+{% endblock %}
+
